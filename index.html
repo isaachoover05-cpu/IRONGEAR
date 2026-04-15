@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRONMAN Gear Center</title>
+<style>
+  :root {
+    --red: #CC0000;
+    --red-dark: #990000;
+    --red-light: #ff2222;
+    --black: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --surface3: #282828;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f0;
+    --text2: #a0a0a0;
+    --text3: #666;
+    --owned: #16a34a;
+    --owned-bg: rgba(22,163,74,0.12);
+    --wish: #b45309;
+    --wish-bg: rgba(180,83,9,0.12);
+    --research: #1d4ed8;
+    --research-bg: rgba(29,78,216,0.12);
+    --retire: #6b7280;
+    --retire-bg: rgba(107,114,128,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-dot {
+    width: 28px; height: 28px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .header-right {
+    display: flex; gap: 8px;
+  }
+  .hbtn {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .hbtn:hover { background: var(--surface3); color: var(--text); }
+  .hbtn.active, .hbtn.red {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+  .hbtn.red:hover { background: var(--red-light); }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb {
+    padding: 10px 24px;
+    font-size: 12px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .breadcrumb span.link {
+    color: var(--text2);
+    cursor: pointer;
+  }
+  .breadcrumb span.link:hover { color: var(--text); text-decoration: underline; }
+  .breadcrumb span.sep { color: var(--text3); }
+
+  /* ── MAIN ── */
+  .main { padding: 20px 24px 60px; }
+
+  /* ── DASHBOARD ── */
+  #view-dashboard {}
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-card .value.red { color: var(--red); }
+  .stat-card .value.green { color: var(--owned); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 18px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  .cat-card:hover {
+    border-color: var(--border2);
+    background: var(--surface2);
+    transform: translateY(-1px);
+  }
+  .cat-card .cat-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .cat-card .cat-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .cat-card .cat-meta {
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.5;
+  }
+  .cat-card .cat-meta .count { color: var(--text2); font-weight: 500; }
+  .cat-card .cat-delete {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    line-height: 1;
+  }
+  .cat-card:hover .cat-delete { opacity: 1; }
+  .cat-card .cat-delete:hover { color: var(--red); background: var(--surface3); }
+
+  /* Color accents per card */
+  .accent-red::before { background: #CC0000; }
+  .accent-blue::before { background: #1d6fdb; }
+  .accent-green::before { background: #16a34a; }
+  .accent-amber::before { background: #d97706; }
+  .accent-teal::before { background: #0891b2; }
+  .accent-purple::before { background: #7c3aed; }
+  .accent-pink::before { background: #db2777; }
+  .accent-white::before { background: #888; }
+
+  /* Add category card */
+  .cat-card.add-cat {
+    border-style: dashed;
+    border-color: var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    color: var(--text3);
+    transition: all 0.15s;
+  }
+  .cat-card.add-cat::before { display: none; }
+  .cat-card.add-cat:hover { border-color: var(--red); color: var(--text2); background: var(--surface2); }
+  .cat-card.add-cat .plus { font-size: 22px; line-height: 1; }
+  .cat-card.add-cat .add-label { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* ── CATEGORY VIEW ── */
+  #view-category { display: none; }
+
+  .cat-view-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .cat-view-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .cat-view-info h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .cat-view-info p {
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .cat-view-info p .highlight { color: var(--text2); }
+
+  /* Sort bar */
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .sort-label {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .sort-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 12px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-weight: 500;
+  }
+  .sort-btn:hover { border-color: var(--border2); color: var(--text); }
+  .sort-btn.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+
+  /* Add gear form */
+  .add-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .add-form .form-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text3);
+    margin-bottom: 5px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.12s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--red);
+  }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .form-group select option { background: var(--surface2); }
+  .form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .btn-primary {
+    background: var(--red);
+    border: 1px solid var(--red);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .btn-primary:hover { background: var(--red-light); }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  /* Gear items list */
+  .gear-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .gear-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: border-color 0.12s;
+    position: relative;
+  }
+  .gear-item:hover { border-color: var(--border2); }
+
+  .gear-item .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .gear-item .item-body { flex: 1; min-width: 0; }
+  .gear-item .item-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .gear-item .item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .gear-item .item-brand {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  .gear-item .item-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-owned { background: var(--owned-bg); color: var(--owned); }
+  .badge-wish { background: var(--wish-bg); color: var(--wish); }
+  .badge-research { background: var(--research-bg); color: var(--research); }
+  .badge-retire { background: var(--retire-bg); color: var(--retire); }
+
+  .dot-owned { background: var(--owned); }
+  .dot-wish { background: var(--wish); }
+  .dot-research { background: var(--research); }
+  .dot-retire { background: var(--retire); }
+
+  .item-price {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+  }
+  .item-weight {
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .item-notes {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .item-link {
+    font-size: 12px;
+    color: #4a9eff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 4px;
+  }
+  .item-link:hover { text-decoration: underline; }
+  .item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .icon-btn {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 5px;
+    transition: all 0.12s;
+    line-height: 1;
+  }
+  .icon-btn:hover { background: var(--surface2); color: var(--text); }
+  .icon-btn.delete:hover { color: var(--red); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  /* ── INVENTORY VIEW ── */
+  #view-inventory { display: none; }
+  .inventory-group { margin-bottom: 28px; }
+  .inventory-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .inventory-group-header .group-icon { font-size: 16px; }
+  .inventory-group-header .group-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .inventory-group-header .group-total {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .modal h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+  .color-picker {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .color-swatch {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.12s;
+  }
+  .color-swatch.selected { border-color: #fff; transform: scale(1.15); }
+  .color-swatch[data-color="red"] { background: #CC0000; }
+  .color-swatch[data-color="blue"] { background: #1d6fdb; }
+  .color-swatch[data-color="green"] { background: #16a34a; }
+  .color-swatch[data-color="amber"] { background: #d97706; }
+  .color-swatch[data-color="teal"] { background: #0891b2; }
+  .color-swatch[data-color="purple"] { background: #7c3aed; }
+  .color-swatch[data-color="pink"] { background: #db2777; }
+  .color-swatch[data-color="white"] { background: #888; }
+
+  /* Edit modal */
+  .edit-form .form-row { margin-bottom: 10px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+  @media (max-width: 540px) {
+    .header { padding: 0 14px; }
+    .main { padding: 14px 14px 60px; }
+    .form-row, .form-row.three { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-dot">IM</div>
+    <h1>Gear Center</h1>
+  </div>
+  <div class="header-right">
+    <button class="hbtn" id="btn-inventory" onclick="showInventory()">&#9776; Inventory</button>
+    <button class="hbtn red" id="btn-dashboard" onclick="showDashboard()">Dashboard</button>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb" id="breadcrumb">
+  <span>IRONMAN Gear Center</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div id="view-dashboard">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="section-header">
+      <span class="section-title">Gear Categories</span>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+
+  <!-- CATEGORY VIEW -->
+  <div id="view-category">
+    <div class="cat-view-header">
+      <span class="cat-view-icon" id="cv-icon"></span>
+      <div class="cat-view-info">
+        <h2 id="cv-name"></h2>
+        <p id="cv-meta"></p>
+      </div>
+    </div>
+
+    <div class="sort-bar">
+      <span class="sort-label">Sort</span>
+      <button class="sort-btn active" data-sort="status" onclick="setSort('status',this)">Status</button>
+      <button class="sort-btn" data-sort="name" onclick="setSort('name',this)">Name</button>
+      <button class="sort-btn" data-sort="price-asc" onclick="setSort('price-asc',this)">Price ↑</button>
+      <button class="sort-btn" data-sort="price-desc" onclick="setSort('price-desc',this)">Price ↓</button>
+      <button class="sort-btn" data-sort="newest" onclick="setSort('newest',this)">Newest</button>
+    </div>
+
+    <div class="add-form">
+      <div class="form-title">Add Gear Item</div>
+      <div class="form-row three">
+        <div class="form-group">
+          <label>Item Name *</label>
+          <input type="text" id="in-name" placeholder="e.g. Wetsuit" />
+        </div>
+        <div class="form-group">
+          <label>Brand</label>
+          <input type="text" id="in-brand" placeholder="e.g. HUUB" />
+        </div>
+        <div class="form-group">
+          <label>Status *</label>
+          <select id="in-status">
+            <option value="owned">Owned</option>
+            <option value="wish">Wishlist</option>
+            <option value="research">Research</option>
+            <option value="retire">Retire</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row three">
+        <div class="form-group">
+          <label>Price ($)</label>
+          <input type="number" id="in-price" placeholder="0.00" step="0.01" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Weight (g/oz)</label>
+          <input type="text" id="in-weight" placeholder="e.g. 250g" />
+        </div>
+        <div class="form-group">
+          <label>Link / URL</label>
+          <input type="url" id="in-link" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="in-notes" placeholder="Size, color, spec notes, when purchased..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="addItem()">Add Item</button>
+        <button class="btn-ghost" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+
+    <div class="gear-list" id="gear-list"></div>
+  </div>
+
+  <!-- INVENTORY VIEW -->
+  <div id="view-inventory">
+    <div class="section-header" style="margin-bottom:16px;">
+      <span class="section-title">Full Inventory — All Categories</span>
+    </div>
+    <div id="inventory-content"></div>
+  </div>
+
+</div>
+
+<!-- ADD CATEGORY MODAL -->
+<div class="modal-overlay" id="modal-addcat">
+  <div class="modal">
+    <h3>New Gear Category</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category Name *</label>
+        <input type="text" id="new-cat-name" placeholder="e.g. Swim" />
+      </div>
+      <div class="form-group">
+        <label>Emoji Icon</label>
+        <input type="text" id="new-cat-icon" placeholder="e.g. 🏊" maxlength="4" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:8px;">Accent Color</label>
+      <div class="color-picker" id="color-picker">
+        <div class="color-swatch selected" data-color="red"></div>
+        <div class="color-swatch" data-color="blue"></div>
+        <div class="color-swatch" data-color="green"></div>
+        <div class="color-swatch" data-color="amber"></div>
+        <div class="color-swatch" data-color="teal"></div>
+        <div class="color-swatch" data-color="purple"></div>
+        <div class="color-swatch" data-color="pink"></div>
+        <div class="color-swatch" data-color="white"></div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" onclick="saveCategory()">Create</button>
+      <button class="btn-ghost" onclick="closeModal('modal-addcat')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT ITEM MODAL -->
+<div class="modal-overlay" id="modal-edititem">
+  <div class="modal edit-form">
+    <h3>Edit Gear Item</h3>
+    <div class="form-row three">
+      <div class="form-group">
+        <label>Item Name *</label>
+        <input type="text" id="edit-name" />
+      </div>
+      <div class="form-group">
+        <label>Brand</label>
+        <input type="text" id="edit-brand" />
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="edit-status">
+          <option value="owned">Owned</option>
+          <option value="wish">Wishlist</option>
+          <option value="research">Research</option>
+          <option value="retire">Retire</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row three">
+      <div class="form-group">
+        <label>Price ($)</label>
+        <input type="number" id="edit-price" step="0.01" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Weight</label>
+        <input type="text" id="edit-weight" />
+      </div>
+      <div class="form-group">
+        <label>Link / URL</label>
+        <input type="url" id="edit-link" />
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="edit-notes"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" onclick="saveEdit()">Save</button>
+      <button class="btn-ghost" onclick="closeModal('modal-edititem')">Cancel</button>
+    </div>
+    <input type="hidden" id="edit-cat-id" />
+    <input type="hidden" id="edit-item-id" />
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let db = loadDB();
+let currentCatId = null;
+let currentSort = 'status';
+let selectedColor = 'red';
+let editingItemId = null;
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem('ironman-gear-db');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { categories: getDefaultCategories(), items: {} };
+}
+
+function saveDB() {
+  localStorage.setItem('ironman-gear-db', JSON.stringify(db));
+}
+
+function getDefaultCategories() {
+  return [
+    { id: 'swim', name: 'Swim', icon: '🏊', color: 'blue' },
+    { id: 'bike', name: 'Bike', icon: '🚴', color: 'red' },
+    { id: 'run', name: 'Run', icon: '🏃', color: 'amber' },
+    { id: 'nutrition', name: 'Nutrition', icon: '⚡', color: 'green' },
+    { id: 't1t2', name: 'T1 / T2', icon: '🎒', color: 'purple' },
+    { id: 'recovery', name: 'Recovery', icon: '🧊', color: 'teal' },
+    { id: 'raceday', name: 'Race Day', icon: '🏅', color: 'pink' },
+    { id: 'training', name: 'Training Gear', icon: '🏋️', color: 'white' },
+  ];
+}
+
+// ── VIEWS ──
+function showDashboard() {
+  currentCatId = null;
+  document.getElementById('view-dashboard').style.display = 'block';
+  document.getElementById('view-category').style.display = 'none';
+  document.getElementById('view-inventory').style.display = 'none';
+  document.getElementById('btn-dashboard').classList.add('active','red');
+  document.getElementById('btn-inventory').classList.remove('active','red');
+  updateBreadcrumb();
+  renderStats();
+  renderGrid();
+}
+
+function showCategory(catId) {
+  currentCatId = catId;
+  const cat = db.categories.find(c => c.id === catId);
+  if (!cat) return;
+  document.getElementById('view-dashboard').style.display = 'none';
+  document.getElementById('view-category').style.display = 'block';
+  document.getElementById('view-inventory').style.display = 'none';
+  document.getElementById('cv-icon').textContent = cat.icon;
+  document.getElementById('cv-name').textContent = cat.name;
+  updateBreadcrumb(cat);
+  renderCategoryMeta(cat);
+  renderItems();
+}
+
+function showInventory() {
+  currentCatId = null;
+  document.getElementById('view-dashboard').style.display = 'none';
+  document.getElementById('view-category').style.display = 'none';
+  document.getElementById('view-inventory').style.display = 'block';
+  document.getElementById('btn-inventory').classList.add('active','red');
+  document.getElementById('btn-dashboard').classList.remove('active','red');
+  updateBreadcrumb(null, true);
+  renderInventory();
+}
+
+function updateBreadcrumb(cat, inv) {
+  const bc = document.getElementById('breadcrumb');
+  if (inv) {
+    bc.innerHTML = `<span class="link" onclick="showDashboard()">IRONMAN Gear Center</span><span class="sep">›</span><span>Inventory</span>`;
+  } else if (cat) {
+    bc.innerHTML = `<span class="link" onclick="showDashboard()">IRONMAN Gear Center</span><span class="sep">›</span><span>${cat.name}</span>`;
+  } else {
+    bc.innerHTML = `<span>IRONMAN Gear Center</span>`;
+  }
+}
+
+// ── STATS ──
+function renderStats() {
+  const allItems = Object.values(db.items).flat();
+  const owned = allItems.filter(i => i.status === 'owned');
+  const wish = allItems.filter(i => i.status === 'wish');
+  const totalValue = owned.reduce((s,i) => s + (parseFloat(i.price)||0), 0);
+  const wishValue = wish.reduce((s,i) => s + (parseFloat(i.price)||0), 0);
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card">
+      <div class="label">Total Items</div>
+      <div class="value">${allItems.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Owned</div>
+      <div class="value green">${owned.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Gear Value</div>
+      <div class="value">$${totalValue.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Wishlist</div>
+      <div class="value red">${wish.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Wishlist $</div>
+      <div class="value">$${wishValue.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Categories</div>
+      <div class="value">${db.categories.length}</div>
+    </div>
+  `;
+}
+
+// ── GRID ──
+function renderGrid() {
+  const grid = document.getElementById('cat-grid');
+  let html = '';
+  db.categories.forEach(cat => {
+    const items = db.items[cat.id] || [];
+    const owned = items.filter(i => i.status==='owned').length;
+    const wish = items.filter(i => i.status==='wish').length;
+    const totalVal = items.filter(i=>i.status==='owned').reduce((s,i)=>s+(parseFloat(i.price)||0),0);
+    html += `
+      <div class="cat-card accent-${cat.color}" onclick="showCategory('${cat.id}')">
+        <button class="cat-delete" onclick="event.stopPropagation();deleteCategory('${cat.id}')" title="Delete category">&#10005;</button>
+        <span class="cat-icon">${cat.icon}</span>
+        <div class="cat-name">${cat.name}</div>
+        <div class="cat-meta">
+          <span class="count">${items.length}</span> item${items.length!==1?'s':''}
+          ${owned>0?` &middot; <span class="count">${owned}</span> owned`:''}
+          ${wish>0?` &middot; <span style="color:var(--wish)">${wish}</span> wishlist`:''}
+          ${totalVal>0?`<br>$${totalVal.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})} invested`:''}
+        </div>
+      </div>`;
+  });
+  html += `
+    <div class="cat-card add-cat" onclick="openModal('modal-addcat')">
+      <span class="plus">+</span>
+      <span class="add-label">New Category</span>
+    </div>`;
+  grid.innerHTML = html;
+}
+
+// ── CATEGORY META ──
+function renderCategoryMeta(cat) {
+  const items = db.items[cat.id] || [];
+  const owned = items.filter(i=>i.status==='owned').length;
+  const wish = items.filter(i=>i.status==='wish').length;
+  const research = items.filter(i=>i.status==='research').length;
+  const val = items.filter(i=>i.status==='owned').reduce((s,i)=>s+(parseFloat(i.price)||0),0);
+  document.getElementById('cv-meta').innerHTML =
+    `<span class="highlight">${items.length} item${items.length!==1?'s':''}</span>`+
+    (owned?` &nbsp;·&nbsp; <span class="highlight" style="color:var(--owned)">${owned} owned</span>`:'') +
+    (wish?` &nbsp;·&nbsp; <span class="highlight" style="color:var(--wish)">${wish} wishlist</span>`:'') +
+    (research?` &nbsp;·&nbsp; <span class="highlight" style="color:var(--research)">${research} research</span>`:'') +
+    (val>0?` &nbsp;·&nbsp; <span class="highlight">$${val.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})} invested</span>`:'');
+}
+
+// ── ITEMS ──
+const STATUS_ORDER = { owned:0, wish:1, research:2, retire:3 };
+
+function getSortedItems(catId) {
+  let items = [...(db.items[catId] || [])];
+  if (currentSort === 'status') items.sort((a,b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+  else if (currentSort === 'name') items.sort((a,b) => a.name.localeCompare(b.name));
+  else if (currentSort === 'price-asc') items.sort((a,b) => (parseFloat(a.price)||0)-(parseFloat(b.price)||0));
+  else if (currentSort === 'price-desc') items.sort((a,b) => (parseFloat(b.price)||0)-(parseFloat(a.price)||0));
+  else if (currentSort === 'newest') items.sort((a,b) => b.created - a.created);
+  return items;
+}
+
+function renderItems() {
+  const list = document.getElementById('gear-list');
+  const items = getSortedItems(currentCatId);
+  const cat = db.categories.find(c => c.id === currentCatId);
+  if (cat) renderCategoryMeta(cat);
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><p>No gear yet.<br>Add your first item above.</p></div>`;
+    return;
+  }
+  list.innerHTML = items.map(item => itemHTML(item)).join('');
+}
+
+function itemHTML(item) {
+  const statusLabels = { owned:'Owned', wish:'Wishlist', research:'Research', retire:'Retire' };
+  return `
+    <div class="gear-item" id="item-${item.id}">
+      <div class="status-dot dot-${item.status}"></div>
+      <div class="item-body">
+        <div class="item-top">
+          <div class="item-name">${escHtml(item.name)}</div>
+        </div>
+        ${item.brand ? `<div class="item-brand">${escHtml(item.brand)}</div>` : ''}
+        <div class="item-meta">
+          <span class="status-badge badge-${item.status}">${statusLabels[item.status]}</span>
+          ${item.price ? `<span class="item-price">$${parseFloat(item.price).toFixed(2)}</span>` : ''}
+          ${item.weight ? `<span class="item-weight">${escHtml(item.weight)}</span>` : ''}
+        </div>
+        ${item.notes ? `<div class="item-notes">${escHtml(item.notes)}</div>` : ''}
+        ${item.link ? `<a class="item-link" href="${escHtml(item.link)}" target="_blank" rel="noopener">&#8599; View product</a>` : ''}
+      </div>
+      <div class="item-actions">
+        <button class="icon-btn" onclick="openEditItem('${currentCatId}','${item.id}')" title="Edit">&#9998;</button>
+        <button class="icon-btn delete" onclick="deleteItem('${currentCatId}','${item.id}')" title="Delete">&#10005;</button>
+      </div>
+    </div>`;
+}
+
+function addItem() {
+  const name = document.getElementById('in-name').value.trim();
+  if (!name) { document.getElementById('in-name').focus(); return; }
+  const item = {
+    id: 'i' + Date.now(),
+    name,
+    brand: document.getElementById('in-brand').value.trim(),
+    status: document.getElementById('in-status').value,
+    price: document.getElementById('in-price').value.trim(),
+    weight: document.getElementById('in-weight').value.trim(),
+    link: document.getElementById('in-link').value.trim(),
+    notes: document.getElementById('in-notes').value.trim(),
+    created: Date.now()
+  };
+  if (!db.items[currentCatId]) db.items[currentCatId] = [];
+  db.items[currentCatId].push(item);
+  saveDB();
+  clearForm();
+  renderItems();
+}
+
+function clearForm() {
+  ['in-name','in-brand','in-price','in-weight','in-link','in-notes'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('in-status').value = 'owned';
+}
+
+function deleteItem(catId, itemId) {
+  if (!confirm('Delete this item?')) return;
+  db.items[catId] = (db.items[catId]||[]).filter(i => i.id !== itemId);
+  saveDB();
+  renderItems();
+}
+
+function openEditItem(catId, itemId) {
+  const item = (db.items[catId]||[]).find(i => i.id === itemId);
+  if (!item) return;
+  editingItemId = itemId;
+  document.getElementById('edit-cat-id').value = catId;
+  document.getElementById('edit-item-id').value = itemId;
+  document.getElementById('edit-name').value = item.name;
+  document.getElementById('edit-brand').value = item.brand||'';
+  document.getElementById('edit-status').value = item.status;
+  document.getElementById('edit-price').value = item.price||'';
+  document.getElementById('edit-weight').value = item.weight||'';
+  document.getElementById('edit-link').value = item.link||'';
+  document.getElementById('edit-notes').value = item.notes||'';
+  openModal('modal-edititem');
+}
+
+function saveEdit() {
+  const catId = document.getElementById('edit-cat-id').value;
+  const itemId = document.getElementById('edit-item-id').value;
+  const item = (db.items[catId]||[]).find(i => i.id === itemId);
+  if (!item) return;
+  item.name = document.getElementById('edit-name').value.trim() || item.name;
+  item.brand = document.getElementById('edit-brand').value.trim();
+  item.status = document.getElementById('edit-status').value;
+  item.price = document.getElementById('edit-price').value.trim();
+  item.weight = document.getElementById('edit-weight').value.trim();
+  item.link = document.getElementById('edit-link').value.trim();
+  item.notes = document.getElementById('edit-notes').value.trim();
+  saveDB();
+  closeModal('modal-edititem');
+  renderItems();
+}
+
+// ── SORT ──
+function setSort(s, el) {
+  currentSort = s;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderItems();
+}
+
+// ── CATEGORIES ──
+function saveCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) { document.getElementById('new-cat-name').focus(); return; }
+  const icon = document.getElementById('new-cat-icon').value.trim() || '📦';
+  const cat = { id: 'c' + Date.now(), name, icon, color: selectedColor };
+  db.categories.push(cat);
+  saveDB();
+  closeModal('modal-addcat');
+  document.getElementById('new-cat-name').value = '';
+  document.getElementById('new-cat-icon').value = '';
+  renderStats();
+  renderGrid();
+}
+
+function deleteCategory(catId) {
+  const cat = db.categories.find(c=>c.id===catId);
+  const count = (db.items[catId]||[]).length;
+  if (!confirm(`Delete "${cat?.name}" and its ${count} item${count!==1?'s':''}?`)) return;
+  db.categories = db.categories.filter(c => c.id !== catId);
+  delete db.items[catId];
+  saveDB();
+  renderStats();
+  renderGrid();
+}
+
+// ── INVENTORY ──
+function renderInventory() {
+  const cont = document.getElementById('inventory-content');
+  let html = '';
+  let grandTotal = 0;
+  let grandCount = 0;
+  db.categories.forEach(cat => {
+    const items = db.items[cat.id] || [];
+    const owned = items.filter(i => i.status === 'owned');
+    if (!owned.length) return;
+    const catTotal = owned.reduce((s,i)=>s+(parseFloat(i.price)||0),0);
+    grandTotal += catTotal;
+    grandCount += owned.length;
+    html += `
+      <div class="inventory-group">
+        <div class="inventory-group-header">
+          <span class="group-icon">${cat.icon}</span>
+          <span class="group-name">${cat.name}</span>
+          <span class="group-total">${owned.length} item${owned.length!==1?'s':''}${catTotal>0?' · $'+catTotal.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}):''}</span>
+        </div>
+        <div class="gear-list">
+          ${owned.map(item => `
+            <div class="gear-item">
+              <div class="status-dot dot-owned"></div>
+              <div class="item-body">
+                <div class="item-top"><div class="item-name">${escHtml(item.name)}</div></div>
+                ${item.brand ? `<div class="item-brand">${escHtml(item.brand)}</div>` : ''}
+                <div class="item-meta">
+                  <span class="status-badge badge-owned">Owned</span>
+                  ${item.price ? `<span class="item-price">$${parseFloat(item.price).toFixed(2)}</span>` : ''}
+                  ${item.weight ? `<span class="item-weight">${escHtml(item.weight)}</span>` : ''}
+                </div>
+                ${item.notes ? `<div class="item-notes">${escHtml(item.notes)}</div>` : ''}
+                ${item.link ? `<a class="item-link" href="${escHtml(item.link)}" target="_blank" rel="noopener">&#8599; View product</a>` : ''}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  });
+  if (!grandCount) {
+    html = `<div class="empty-state"><div class="empty-icon">📦</div><p>No owned gear yet.<br>Mark items as "Owned" in any category to see them here.</p></div>`;
+  } else {
+    html = `<div class="stats-row" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="label">Total Owned</div><div class="value green">${grandCount}</div></div>
+      <div class="stat-card"><div class="label">Total Value</div><div class="value">$${grandTotal.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}</div></div>
+    </div>` + html;
+  }
+  cont.innerHTML = html;
+}
+
+// ── MODAL ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ── COLOR PICKER ──
+document.querySelectorAll('.color-swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    selectedColor = sw.dataset.color;
+  });
+});
+
+// ── UTILS ──
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──
+showDashboard();
+</script>
+</body>
+</html>
